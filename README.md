@@ -1,7 +1,7 @@
 
 # Instruction (once):
 
-        • Copy OBU_Updater.exe to where ever you want and run it
+        • Copy "OBU_Updater.exe" to where ever you want and run it
         • In "Settings" area select your OpenBullet.exe location
         • Click "Save Settings" and then click "Check for Update"
         
