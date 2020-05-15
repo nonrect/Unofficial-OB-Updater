@@ -51,7 +51,6 @@ Public Class frmMain
     End Sub
 
     Private Sub mnuSkipUpdate_Click(sender As Object, e As EventArgs) Handles mnuSkipUpdate.Click
-        'Making changes
         Dim Result As DialogResult = MessageBox.Show("Always skip current update(s) ?" & vbNewLine & vbNewLine & "Yes - Always skip  (You get notified for newer updates)" & vbNewLine & "No - Skip just once", "Always Skip", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
         If Result = DialogResult.Yes Then ' Alwats skip
             If LastUpdate <> "" Then
