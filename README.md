@@ -5,7 +5,7 @@
 	• Click "Save Settings" and then click "Check for Update"
 
 	Note: From now on you only run "OBU_Updater.exe" instead of "OpenBullet.exe".
-	   On every launch, if it's updated, it will quickly launch the Updated OB
+	      On every launch, if it's updated, it will quickly launch the Updated OB
 
 
 # Requirements:
