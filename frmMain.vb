@@ -30,6 +30,7 @@ Public Class frmMain
             End If
 
         Catch ex As Exception
+            MessageBox.Show("Error Log: " + ex.Message, "Error")
             Me.Height = 525
             txtLog.Text = ""
             lblStatus.Text = "------" : lblStatus.ForeColor = Color.Gray
@@ -112,18 +113,22 @@ Public Class frmMain
     End Sub
 
     Private Sub btnSaveSettings_Click(sender As Object, e As EventArgs) Handles btnSaveSettings.Click
-        If txtOBLocation.Text <> "" Then
-            Call SaveSettings()
-            btnUpdate.Enabled = True : mnuSettings.Enabled = True
-            btnUpdate.Text = "Check for Update"
-            lblStatus.Text = "------" : lblStatus.ForeColor = Color.Gray
-            gpSettings.Enabled = False
-            txtLog.Text = ""
-            Me.Height = 360
-        Else
-            MessageBox.Show("Please identify OpenBullet's file location", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-            btnExeLocation.Select()
-        End If
+        Try
+            If txtOBLocation.Text <> "" Then
+                Call SaveSettings()
+                btnUpdate.Enabled = True : mnuSettings.Enabled = True
+                btnUpdate.Text = "Check for Update"
+                lblStatus.Text = "------" : lblStatus.ForeColor = Color.Gray
+                gpSettings.Enabled = False
+                txtLog.Text = ""
+                Me.Height = 360
+            Else
+                MessageBox.Show("Please identify OpenBullet's file location", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                btnExeLocation.Select()
+            End If
+        Catch ex As Exception
+            MessageBox.Show("Error Log: " + ex.Message, "Error")
+        End Try
     End Sub
 
     Private Sub btnUpdate_Click(sender As Object, e As EventArgs) Handles btnUpdate.Click
@@ -214,7 +219,7 @@ Public Class frmMain
         Catch ex As Exception
             If txtOBLocation.Text <> "" Then
                 If File.Exists(txtOBLocation.Text) Then
-                    MessageBox.Show("An error occured, trying to run OpenBullet ...", "Error")
+                    MessageBox.Show("Error Log: " + ex.Message + vbNewLine + vbNewLine + "Click OK to run OpenBullet ...", "Error")
                     Call RunOpenBullet()
                     Application.Exit()
                 Else
@@ -231,6 +236,7 @@ Public Class frmMain
             downloader = New WebClient
             downloader.DownloadFileAsync(New Uri(DownloadLink), "OBU_update.zip")
         Catch ex As Exception
+            MessageBox.Show("Error Log: " + ex.Message, "Error")
             btnUpdate.Enabled = True : mnuSettings.Enabled = True
             btnUpdate.Text = "Check for Update"
             lblStatus.Text = "Unable to download from github !!" : lblStatus.ForeColor = Color.Gray
@@ -305,6 +311,7 @@ Public Class frmMain
             lblStatus.Text = "New update available" : lblStatus.ForeColor = Color.Green
             PBar1.Visible = False
         Catch ex As Exception
+            MessageBox.Show("Error Log: " + ex.Message, "Error")
             btnUpdate.Enabled = True : mnuSettings.Enabled = True
             mnuSkipUpdate.Enabled = True
             lblStatus.Text = "New update available" : lblStatus.ForeColor = Color.Green
