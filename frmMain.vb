@@ -13,7 +13,6 @@ Public Class frmMain
 
     Private Sub frmMain_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Try
-            'lblStatus.Text = "Checking for update ..." : lblStatus.ForeColor = Color.Gray
             CheckForIllegalCrossThreadCalls = False
 
             If File.Exists(Environment.CurrentDirectory + "\OBU_Settings.txt") Then Call LoadSettings()
@@ -97,7 +96,7 @@ Public Class frmMain
         While True
             If ofd.ShowDialog() <> DialogResult.Cancel Then
                 Dim myFileVersionInfo As FileVersionInfo = FileVersionInfo.GetVersionInfo(ofd.FileName)
-                If myFileVersionInfo.ProductName = "OpenBullet" Then 'Check if correct OpenBullet exe selected
+                If myFileVersionInfo.ProductName = "OpenBullet" Then ' Check if correct OpenBullet exe selected
                     txtOBLocation.Text = ofd.FileName
                     txtOBLocation.Select()
                     txtOBLocation.SelectionStart = txtOBLocation.Text.Length()
@@ -193,7 +192,7 @@ Public Class frmMain
                     txtLog.Text += "v" + matchHS1.Groups(2).Value + "  (" + matchHS2.Groups(1).Value + "):" + vbNewLine
                     txtLog.Text += vbNewLine
 
-                    'Seperate update logs that are more than one line with single line ones
+                    ' Seperate update logs that are more than one line with single line ones
                     Dim matchHS3 As Match = Regex.Match(matchHS2.Groups(2).Value, "^(.*)?", RegexOptions.Multiline)
                     While matchHS3.Success
                         If matchHS3.Groups(1).Value <> "" Then
@@ -253,7 +252,7 @@ Public Class frmMain
                 lblStatus.Text = "Closing OpenBullet ..."
                 Dim pProcess() As Process = Process.GetProcessesByName(Path.GetFileNameWithoutExtension("OpenBullet"))
                 For Each p As Process In pProcess
-                    If p.MainWindowTitle.Contains("Anomaly") = False Then 'Avoid closing anomaly version of OB
+                    If p.MainWindowTitle.Contains("Anomaly") = False Then ' Avoid closing anomaly version of OB
                         p.Kill()
                     End If
                 Next
@@ -272,11 +271,11 @@ Public Class frmMain
                 ' Moving update files
                 lblStatus.Text = "Updating files ..."
                 Dim cm As String = "ROBOCOPY " + Chr(34) + Environment.CurrentDirectory + "\OBU_update\Release" + Chr(34) + " " + Chr(34) + OBDirectory.DirectoryName + Chr(34) + " /E /IS /MOVE"
-                Call RunCommandCom(cm, "", True) 'Running CMD command for copying update files
+                Call RunCommandCom(cm, "", True) ' Running CMD command for copying update files
 
                 ' Removing additional Files
                 lblStatus.Text = "Clearing temp items ..."
-                For i = 1 To 10 ' 10 tries to remove the files
+                For i = 1 To 6 ' 6 tries to remove the files
                     If Directory.Exists(Environment.CurrentDirectory + "\OBU_update\Release") Then : Thread.Sleep(500)
                     Else : Exit For : End If
                 Next
@@ -319,7 +318,7 @@ Public Class frmMain
         Dim pi As ProcessStartInfo = New ProcessStartInfo()
         pi.Arguments = " " + If(permanent = True, "/K", "/C") + " " + command + " " + arguments
         pi.FileName = "cmd.exe"
-        pi.WindowStyle = ProcessWindowStyle.Hidden 'hidden mode
+        pi.WindowStyle = ProcessWindowStyle.Hidden ' Hidden mode
         p.StartInfo = pi
         p.Start()
     End Sub
