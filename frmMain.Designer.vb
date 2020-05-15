@@ -40,8 +40,8 @@ Partial Class frmMain
         Me.btnSaveSettings = New System.Windows.Forms.Button()
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.mnuSettings = New System.Windows.Forms.ToolStripMenuItem()
-        Me.PBar1 = New System.Windows.Forms.ProgressBar()
         Me.mnuSkipUpdate = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PBar1 = New System.Windows.Forms.ProgressBar()
         Me.gpSettings.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -88,8 +88,10 @@ Partial Class frmMain
         '
         'txtOBLocation
         '
+        Me.txtOBLocation.BackColor = System.Drawing.Color.White
         Me.txtOBLocation.Location = New System.Drawing.Point(100, 28)
         Me.txtOBLocation.Name = "txtOBLocation"
+        Me.txtOBLocation.ReadOnly = True
         Me.txtOBLocation.Size = New System.Drawing.Size(287, 20)
         Me.txtOBLocation.TabIndex = 4
         '
@@ -98,7 +100,7 @@ Partial Class frmMain
         Me.txtCurrentVersion.Location = New System.Drawing.Point(100, 53)
         Me.txtCurrentVersion.Name = "txtCurrentVersion"
         Me.txtCurrentVersion.Size = New System.Drawing.Size(154, 20)
-        Me.txtCurrentVersion.TabIndex = 5
+        Me.txtCurrentVersion.TabIndex = 3
         '
         'Label3
         '
@@ -115,7 +117,7 @@ Partial Class frmMain
         Me.btnExeLocation.Location = New System.Drawing.Point(393, 27)
         Me.btnExeLocation.Name = "btnExeLocation"
         Me.btnExeLocation.Size = New System.Drawing.Size(41, 20)
-        Me.btnExeLocation.TabIndex = 7
+        Me.btnExeLocation.TabIndex = 2
         Me.btnExeLocation.Text = "..."
         Me.btnExeLocation.UseVisualStyleBackColor = True
         '
@@ -125,7 +127,7 @@ Partial Class frmMain
         Me.chkNotUpdateEnviromentINI.Location = New System.Drawing.Point(15, 79)
         Me.chkNotUpdateEnviromentINI.Name = "chkNotUpdateEnviromentINI"
         Me.chkNotUpdateEnviromentINI.Size = New System.Drawing.Size(188, 17)
-        Me.chkNotUpdateEnviromentINI.TabIndex = 9
+        Me.chkNotUpdateEnviromentINI.TabIndex = 4
         Me.chkNotUpdateEnviromentINI.Text = "Don't update my ""Environment.ini"""
         Me.chkNotUpdateEnviromentINI.UseVisualStyleBackColor = True
         '
@@ -195,7 +197,7 @@ Partial Class frmMain
         Me.btnSaveSettings.Location = New System.Drawing.Point(15, 102)
         Me.btnSaveSettings.Name = "btnSaveSettings"
         Me.btnSaveSettings.Size = New System.Drawing.Size(419, 27)
-        Me.btnSaveSettings.TabIndex = 10
+        Me.btnSaveSettings.TabIndex = 5
         Me.btnSaveSettings.Text = "Save Settings"
         Me.btnSaveSettings.UseVisualStyleBackColor = True
         '
@@ -215,14 +217,6 @@ Partial Class frmMain
         Me.mnuSettings.Size = New System.Drawing.Size(61, 20)
         Me.mnuSettings.Text = "Settings"
         '
-        'PBar1
-        '
-        Me.PBar1.Location = New System.Drawing.Point(12, 64)
-        Me.PBar1.Name = "PBar1"
-        Me.PBar1.Size = New System.Drawing.Size(445, 10)
-        Me.PBar1.TabIndex = 15
-        Me.PBar1.Visible = False
-        '
         'mnuSkipUpdate
         '
         Me.mnuSkipUpdate.BackColor = System.Drawing.Color.SkyBlue
@@ -230,6 +224,14 @@ Partial Class frmMain
         Me.mnuSkipUpdate.Name = "mnuSkipUpdate"
         Me.mnuSkipUpdate.Size = New System.Drawing.Size(82, 20)
         Me.mnuSkipUpdate.Text = "Skip Update"
+        '
+        'PBar1
+        '
+        Me.PBar1.Location = New System.Drawing.Point(12, 64)
+        Me.PBar1.Name = "PBar1"
+        Me.PBar1.Size = New System.Drawing.Size(445, 10)
+        Me.PBar1.TabIndex = 15
+        Me.PBar1.Visible = False
         '
         'frmMain
         '
@@ -250,7 +252,7 @@ Partial Class frmMain
         Me.MaximizeBox = False
         Me.Name = "frmMain"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Unofficial OB Updater"
+        Me.Text = "Unofficial OB Updater v1.0.2"
         Me.gpSettings.ResumeLayout(False)
         Me.gpSettings.PerformLayout()
         Me.MenuStrip1.ResumeLayout(False)

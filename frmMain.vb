@@ -6,9 +6,10 @@ Imports System.Threading
 
 Public Class frmMain
 
-    Dim NewUpdateAvailable As Boolean = False
     Dim NewUpdateVersion As String = ""
     Dim DownloadLink As String = ""
+    Dim LastUpdate As String = ""
+    Dim LastUpdateToAlwaysSkip As String = ""
 
     Private Sub frmMain_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Try
@@ -21,18 +22,20 @@ Public Class frmMain
                 lblStatus.Text = "Checking for update ..." : lblStatus.ForeColor = Color.Gray
                 Dim login As New Thread(AddressOf CheckForUpdate)
                 login.Start()
+
             Else
                 Me.Height = 525
                 lblStatus.Text = "------" : lblStatus.ForeColor = Color.Gray
-                gpSettings.Enabled = True
+                gpSettings.Enabled = True : mnuSettings.Enabled = False
                 btnExeLocation.Select()
             End If
+
         Catch ex As Exception
             Me.Height = 525
             txtLog.Text = ""
             lblStatus.Text = "------" : lblStatus.ForeColor = Color.Gray
             btnUpdate.Text = "Check for Update" : btnUpdate.Enabled = False
-            gpSettings.Enabled = True
+            gpSettings.Enabled = True : mnuSettings.Enabled = False
             btnExeLocation.Select()
         End Try
     End Sub
@@ -43,17 +46,36 @@ Public Class frmMain
 
     Private Sub mnuSettings_Click(sender As Object, e As EventArgs) Handles mnuSettings.Click
         Me.Height = 525
-        gpSettings.Enabled = True
+        gpSettings.Enabled = True : mnuSettings.Enabled = False
         btnExeLocation.Select()
     End Sub
 
     Private Sub mnuSkipUpdate_Click(sender As Object, e As EventArgs) Handles mnuSkipUpdate.Click
-        If txtOBLocation.Text <> "" Then
-            If File.Exists(txtOBLocation.Text) Then
-                Call RunOpenBullet()
-                Application.Exit()
+        Dim Result As DialogResult = MessageBox.Show("Always skip current update(s) ?" & vbNewLine & vbNewLine & "Yes - Always skip  (You get notified for newer updates)" & vbNewLine & "No - Skip just once", "Always Skip", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+        If Result = DialogResult.Yes Then ' Alwats skip
+            If LastUpdate <> "" Then
+                LastUpdateToAlwaysSkip = LastUpdate
+                Call SaveSettings()
+                Thread.Sleep(200)
+                If txtOBLocation.Text <> "" Then
+                    If File.Exists(txtOBLocation.Text) Then
+                        Call RunOpenBullet()
+                        Application.Exit()
+                    End If
+                End If
             End If
+
+        ElseIf Result = DialogResult.No Then ' Skip just once
+            If txtOBLocation.Text <> "" Then
+                If File.Exists(txtOBLocation.Text) Then
+                    Call RunOpenBullet()
+                    Application.Exit()
+                End If
+            End If
+
         End If
+        Exit Sub
+
     End Sub
 
     Friend WithEvents downloader As WebClient
@@ -62,6 +84,7 @@ Public Class frmMain
     End Sub
 
     Private Sub downloader_DownloadFileCompleted(ByVal sender As Object, ByVal e As System.ComponentModel.AsyncCompletedEventArgs) Handles downloader.DownloadFileCompleted
+        Thread.Sleep(1000)
         Call UpdateOB_2()
     End Sub
 
@@ -78,7 +101,6 @@ Public Class frmMain
                     txtOBLocation.Text = ofd.FileName
                     txtOBLocation.Select()
                     txtOBLocation.SelectionStart = txtOBLocation.Text.Length()
-                    'save in OBU_Settings.txt
                     Exit While
                 Else
                     MessageBox.Show("Wrong OpenBullet exe file !!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
@@ -93,7 +115,7 @@ Public Class frmMain
     Private Sub btnSaveSettings_Click(sender As Object, e As EventArgs) Handles btnSaveSettings.Click
         If txtOBLocation.Text <> "" Then
             Call SaveSettings()
-            btnUpdate.Enabled = True
+            btnUpdate.Enabled = True : mnuSettings.Enabled = True
             btnUpdate.Text = "Check for Update"
             lblStatus.Text = "------" : lblStatus.ForeColor = Color.Gray
             gpSettings.Enabled = False
@@ -106,7 +128,8 @@ Public Class frmMain
     End Sub
 
     Private Sub btnUpdate_Click(sender As Object, e As EventArgs) Handles btnUpdate.Click
-        btnUpdate.Enabled = False
+        btnUpdate.Enabled = False : mnuSettings.Enabled = False
+        gpSettings.Enabled = False
         If txtOBLocation.Text = "" Then
             Me.Height = 525
             lblStatus.Text = "------" : lblStatus.ForeColor = Color.Gray
@@ -128,6 +151,7 @@ Public Class frmMain
     Sub CheckForUpdate()
         Try
             btnUpdate.Enabled = False
+            mnuSettings.Enabled = False
             DownloadLink = ""
             txtLog.Text = ""
 
@@ -139,11 +163,13 @@ Public Class frmMain
             Dim result As String = sReader.ReadToEnd()
 
             Dim matchHS_DownloadLink As Match = Regex.Match(result, ">Latest release<\/a>\s+<\/span>\s+<\/div>\s+<ul class="".*"">\s+<li class="".*"">\s+<a href=""\/.*\/tree\/(.*)"" class="".*"" title=""(.*)"">", RegexOptions.IgnoreCase)
-            If txtCurrentVersion.Text = matchHS_DownloadLink.Groups(2).Value Then
+            If txtCurrentVersion.Text = matchHS_DownloadLink.Groups(2).Value Or LastUpdateToAlwaysSkip = matchHS_DownloadLink.Groups(2).Value Then
                 Call RunOpenBullet()
                 Application.Exit()
                 Exit Sub
             End If
+            LastUpdate = matchHS_DownloadLink.Groups(2).Value
+
             If matchHS_DownloadLink.Groups(1).Value <> "" Then
                 NewUpdateVersion = matchHS_DownloadLink.Groups(2).Value
                 If matchHS_DownloadLink.Groups(2).Value <> txtCurrentVersion.Text Then
@@ -153,7 +179,7 @@ Public Class frmMain
                     Exit Sub
                 End If
             Else
-                btnUpdate.Enabled = True
+                btnUpdate.Enabled = True : mnuSettings.Enabled = True
                 btnUpdate.Text = "Check for Update"
                 lblStatus.Text = "Unable to retrieve info from github !!" : lblStatus.ForeColor = Color.Gray
                 Exit Sub
@@ -177,10 +203,10 @@ Public Class frmMain
                     End While
                     txtLog.Text += vbNewLine
 
-                    NewUpdateAvailable = True
                     mnuSkipUpdate.Enabled = True
                     lblStatus.Text = "New Update Available" : lblStatus.ForeColor = Color.Green
                     btnUpdate.Enabled = True : btnUpdate.Text = "Update" : btnUpdate.Select()
+                    mnuSettings.Enabled = True
 
                 Else : Exit While : End If
                 matchHS1 = matchHS1.NextMatch
@@ -200,10 +226,16 @@ Public Class frmMain
     End Sub
 
     Sub UpdateOB_1()
-        lblStatus.ForeColor = Color.RoyalBlue
-        lblStatus.Text = "Downloading update ..."
-        downloader = New WebClient
-        downloader.DownloadFileAsync(New Uri(DownloadLink), "OBU_update.zip")
+        Try
+            lblStatus.ForeColor = Color.RoyalBlue
+            lblStatus.Text = "Downloading update ..."
+            downloader = New WebClient
+            downloader.DownloadFileAsync(New Uri(DownloadLink), "OBU_update.zip")
+        Catch ex As Exception
+            btnUpdate.Enabled = True : mnuSettings.Enabled = True
+            btnUpdate.Text = "Check for Update"
+            lblStatus.Text = "Unable to download from github !!" : lblStatus.ForeColor = Color.Gray
+        End Try
     End Sub
 
     Sub UpdateOB_2()
@@ -270,11 +302,11 @@ Public Class frmMain
                 Application.Exit()
             End If
 
-            btnUpdate.Enabled = True
+            btnUpdate.Enabled = True : mnuSettings.Enabled = True
             lblStatus.Text = "New update available" : lblStatus.ForeColor = Color.Green
             PBar1.Visible = False
         Catch ex As Exception
-            btnUpdate.Enabled = True
+            btnUpdate.Enabled = True : mnuSettings.Enabled = True
             mnuSkipUpdate.Enabled = True
             lblStatus.Text = "New update available" : lblStatus.ForeColor = Color.Green
             PBar1.Visible = False
@@ -297,7 +329,8 @@ Public Class frmMain
         If txtOBLocation.Text <> "" Then
             MySettings += "OpenBullet_Location=" + txtOBLocation.Text + vbNewLine
             MySettings += "Current_Version=" + txtCurrentVersion.Text + vbNewLine
-            MySettings += "Keep_My_Environment.ini=" + chkNotUpdateEnviromentINI.Checked.ToString
+            MySettings += "Keep_My_Environment.ini=" + chkNotUpdateEnviromentINI.Checked.ToString + vbNewLine
+            MySettings += "LastUpdateToAlwaysSkip=" + LastUpdateToAlwaysSkip
             IO.File.WriteAllText(Environment.CurrentDirectory + "\OBU_Settings.txt", MySettings)
         End If
     End Sub
@@ -313,6 +346,8 @@ Public Class frmMain
                         txtCurrentVersion.Text = txt(1)
                     Case "Keep_My_Environment.ini"
                         chkNotUpdateEnviromentINI.Checked = Convert.ToBoolean(txt(1))
+                    Case "LastUpdateToAlwaysSkip"
+                        LastUpdateToAlwaysSkip = txt(1)
                 End Select
             Next
             Thread.Sleep(200)
